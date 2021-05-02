@@ -2,6 +2,7 @@ import { gql } from "apollo-server-express";
 
 const typeDefs = gql`
   type Todo {
+    _id: ID
     user: String
     title: String
     mission: String
@@ -22,6 +23,8 @@ const typeDefs = gql`
   }
   type Mutation {
     addTodo(todo: TodoInput): Todo
+    modifyItem(id: ID!, query: TodoInput): Todo
+    deleteItem(id: ID!): Todo
   }
 `;
 
