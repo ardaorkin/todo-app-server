@@ -1,0 +1,36 @@
+{
+  "name": "todo-app-with-grapql-express-react",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./server --exec babel-node -e js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Arda Örkin",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.14.0",
+    "@babel/node": "^7.13.13",
+    "@babel/preset-env": "^7.14.0",
+    "babel-loader": "^8.2.2",
+    "nodemon": "^2.0.7"
+  },
+  "dependencies": {
+    "apollo-server-express": "^2.24.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "graphql": "^15.5.0",
+    "mongoose": "^5.12.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ardaorkin/todo-app-with-grapql-express-react.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ardaorkin/todo-app-with-grapql-express-react/issues"
+  },
+  "homepage": "https://github.com/ardaorkin/todo-app-with-grapql-express-react#readme",
+  "description": ""
+}
