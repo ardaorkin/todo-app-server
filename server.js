@@ -21,13 +21,14 @@ const startApolloServer = async () => {
       const username = req?.headers?.username;
       const password = req?.headers?.password;
 
-      const user = await validateUser({ username, password })
-        .then((result) => result)
-        .catch((err) => console.log(err));
+      const user = await validateUser({ username, password }).then(
+        (result) => result
+      );
 
       return {
+        user,
         models: {
-          Todo: generateTodoModel(user),
+          Todo: generateTodoModel({ user }),
         },
       };
     },

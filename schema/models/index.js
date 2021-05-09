@@ -1,48 +1,78 @@
 import Todo from "../../db/models/TodoModel";
 import User from "../../db/models/UserModel";
 
-const generateTodoModel = (user) => ({
+const generateTodoModel = ({ user }) => ({
   queries: {
     getAll: () =>
-      new Promise(
-        async (resolve, reject) =>
-          await Todo.find({}, (err, todo) =>
-            err ? reject(err) : resolve(todo)
+      user.role === "admin"
+        ? new Promise(
+            async (resolve, reject) =>
+              await Todo.find({}, (err, todo) =>
+                err ? reject(err) : resolve(todo)
+              )
           )
-      ),
+        : null,
     getUserNotes: () =>
-      new Promise(
-        async (resolve, reject) =>
-          await Todo.find({ owner_id: user._id }, (err, notes) =>
-            err ? reject(err) : resolve(notes)
-          )
-      ),
+      !user
+        ? null
+        : new Promise(
+            async (resolve, reject) =>
+              await Todo.find({ owner_id: user._id }, (err, notes) =>
+                err ? reject(err) : resolve(notes)
+              )
+          ),
     getUsers: () =>
-      new Promise(
-        async (resolve, reject) =>
-          await User.find({}, (err, users) =>
-            err ? reject(err) : resolve(users)
+      user.role === "admin"
+        ? new Promise(
+            async (resolve, reject) =>
+              await User.find({}, (err, users) =>
+                err ? reject(err) : resolve(users)
+              )
           )
-      ),
+        : null,
   },
   mutations: {
     addTodo: (todo) =>
-      new Promise((resolve, reject) =>
-        new Todo(todo).save((err, todo) => (err ? reject(err) : resolve(todo)))
-      ),
+      !user
+        ? null
+        : new Promise((resolve, reject) =>
+            new Todo(
+              Object.assign({}, { ...todo }, { owner_id: user._id })
+            ).save((err, todo) => (err ? reject(err) : resolve(todo)))
+          ),
     modifyItem: (body) =>
-      new Promise(
-        async (resolve, reject) =>
-          await Todo.findByIdAndUpdate(body.id, body.query, (err, todo) =>
-            err ? reject(err) : resolve(todo)
-          )
+      new Promise(async (resolve, reject) =>
+        user.role === "admin"
+          ? await Todo.findByIdAndUpdate(body.id, body.query, (err, todo) =>
+              err ? reject(err) : resolve(todo)
+            )
+          : await Todo.findById(body.id, async (err, todo) =>
+              err
+                ? reject(err)
+                : user._id.toString() === todo.owner_id.toString()
+                ? await Todo.findByIdAndUpdate(
+                    body.id,
+                    body.query,
+                    (err, todo) => (err ? reject(err) : resolve(todo))
+                  )
+                : reject(new Error("Unauthorized"))
+            )
       ),
     deleteItem: (id) =>
-      new Promise(
-        async (resolve, reject) =>
-          await Todo.findByIdAndDelete(id, (err, todo) =>
-            err ? reject(err) : resolve(todo)
-          )
+      new Promise(async (resolve, reject) =>
+        user.role === "admin"
+          ? await Todo.findByIdAndDelete(id, (err, todo) =>
+              err ? reject(err) : resolve(todo)
+            )
+          : await Todo.findById(id, async (err, todo) =>
+              err
+                ? reject(err)
+                : user._id.toString() === todo.owner_id.toString()
+                ? await Todo.findByIdAndDelete(id, (err, todo) =>
+                    err ? reject(err) : resolve(todo)
+                  )
+                : reject(new Error("Unauthorized"))
+            )
       ),
     addUser: (user) =>
       new Promise((resolve, reject) =>

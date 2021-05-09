@@ -15,7 +15,6 @@ const typeDefs = gql`
     title: String
     mission: String
     isDone: Boolean
-    owner_id: ID!
   }
 
   type User {
@@ -32,7 +31,7 @@ const typeDefs = gql`
   type Query {
     getTodoList: [Todo]
     getUsers: [User]
-    getUserNotes(owner_id: ID!): [Todo]
+    getUserNotes: [Todo]
   }
   type Mutation {
     addTodo(todo: TodoInput): Todo
