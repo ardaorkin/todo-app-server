@@ -5,6 +5,7 @@ import resolvers from "./schema/resolvers";
 import generateTodoModel from "./schema/models";
 import dbConnection from "./db/connection";
 import cors from "cors";
+import validateUser from "./controllers/validateUser";
 const startApolloServer = async () => {
   await dbConnection()
     .then((result) => console.log(result))
@@ -16,10 +17,17 @@ const startApolloServer = async () => {
     typeDefs,
     resolvers,
     subscriptions: { path: "/subscriptions" },
-    context: ({ req }) => {
+    context: async ({ req }) => {
+      const username = req?.headers?.username;
+      const password = req?.headers?.password;
+
+      const user = await validateUser({ username, password })
+        .then((result) => result)
+        .catch((err) => console.log(err));
+
       return {
         models: {
-          Todo: generateTodoModel(),
+          Todo: generateTodoModel(user),
         },
       };
     },
